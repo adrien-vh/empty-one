@@ -23,6 +23,11 @@ export default {
         <p>Envoi en cours…</p>
       </div>
 
+      <div v-else-if="modelValue" class="upload-preview">
+        <img :src="modelValue" class="upload-thumbnail" alt="Aperçu" />
+        <p class="upload-subtext">Cliquez ou glissez pour remplacer</p>
+      </div>
+
       <div v-else class="upload-prompt">
         <svg class="upload-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M24 4L14 16H21V28H27V16H34L24 4Z" fill="currentColor"/>
@@ -35,8 +40,11 @@ export default {
       </div>
     </div>
   `,
-  props: {},
-  setup() {
+  props: {
+    modelValue: { type: String, default: '' },
+  },
+  emits: ['update:modelValue'],
+  setup(props, { emit }) {
     const fileInput = ref(null)
     const isDragOver = ref(false)
     const uploading = ref(false)
@@ -50,7 +58,7 @@ export default {
       uploading.value = true
       try {
         const response = await api.uploadImage(file)
-        battleMapConf.value.backgroundUrl = response.url
+        emit('update:modelValue', response.url)
       } finally {
         uploading.value = false
       }
